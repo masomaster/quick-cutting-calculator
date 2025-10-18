@@ -30,9 +30,11 @@ export default function App() {
   const [numBlocks, setNumBlocks] = useState(49);
   const [layout, setLayout] = useState({ rows: 7, cols: 7 });
   
-  // Component types per block
-  const [squaresPerBlock, setSquaresPerBlock] = useState(1);
+  // Component types per block - now split by fabric
+  const [lightSquaresPerBlock, setLightSquaresPerBlock] = useState(4);
+  const [darkSquaresPerBlock, setDarkSquaresPerBlock] = useState(1);
   const [squareFinishedSize, setSquareFinishedSize] = useState(2);
+  
   const [hstPerBlock, setHstPerBlock] = useState(4);
   const [hstFinishedSize, setHstFinishedSize] = useState(2);
   
@@ -41,21 +43,24 @@ export default function App() {
   const hstCutSize = hstFinishedSize + 0.875; // Standard HST formula: finished size + 7/8"
   
   // Total pieces needed
-  const totalSquares = squaresPerBlock * numBlocks;
+  const totalLightSquares = lightSquaresPerBlock * numBlocks;
+  const totalDarkSquares = darkSquaresPerBlock * numBlocks;
   const totalHST = hstPerBlock * numBlocks;
   
-  // SQUARES: Cut strips, then cross-cut into squares
+  // LIGHT SQUARES: Cut strips, then cross-cut into squares
   const squaresPerStrip = Math.floor(fabricWidth / squareCutSize);
-  const stripsForSquares = totalSquares > 0 ? Math.ceil(totalSquares / squaresPerStrip) : 0;
-  const yardageSquares = (stripsForSquares * squareCutSize) / 36;
+  const stripsForLightSquares = totalLightSquares > 0 ? Math.ceil(totalLightSquares / squaresPerStrip) : 0;
+  const yardageLightSquares = (stripsForLightSquares * squareCutSize) / 36;
+  
+  // DARK SQUARES: Cut strips, then cross-cut into squares
+  const stripsForDarkSquares = totalDarkSquares > 0 ? Math.ceil(totalDarkSquares / squaresPerStrip) : 0;
+  const yardageDarkSquares = (stripsForDarkSquares * squareCutSize) / 36;
   
   // HST: Strip piecing method
-  // Need pairs of strips sewn together, then cut into squares, then create HST
-  // Each sewn square pair yields 2 HST units
   const hstSquaresNeeded = Math.ceil(totalHST / 2);
   const hstSquaresPerStripPair = Math.floor(fabricWidth / hstCutSize);
   const stripPairsForHST = Math.ceil(hstSquaresNeeded / hstSquaresPerStripPair);
-  const stripsPerFabric = stripPairsForHST; // Each fabric needs same number of strips
+  const stripsPerFabric = stripPairsForHST;
   const yardageHSTperFabric = (stripsPerFabric * hstCutSize) / 36;
   
   return (
@@ -159,15 +164,26 @@ export default function App() {
                 <div className="space-y-4">
                   <div className="border-b border-pink-200 pb-4">
                     <h3 className="font-semibold text-pink-800 mb-3">Plain Squares</h3>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-3 mb-3">
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">
-                          Per Block
+                          Light per Block
                         </label>
                         <input
                           type="number"
-                          value={squaresPerBlock}
-                          onChange={(e) => setSquaresPerBlock(Number(e.target.value))}
+                          value={lightSquaresPerBlock}
+                          onChange={(e) => setLightSquaresPerBlock(Number(e.target.value))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Dark per Block
+                        </label>
+                        <input
+                          type="number"
+                          value={darkSquaresPerBlock}
+                          onChange={(e) => setDarkSquaresPerBlock(Number(e.target.value))}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                         />
                       </div>
@@ -227,11 +243,11 @@ export default function App() {
                 </div>
                 
                 <div className="space-y-4">
-                  {totalSquares > 0 && (
+                  {totalLightSquares > 0 && (
                     <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-                      <h3 className="font-semibold text-lg mb-2">Plain Squares</h3>
+                      <h3 className="font-semibold text-lg mb-2">Light Fabric - Plain Squares</h3>
                       <p className="text-2xl font-bold mb-2">
-                        Cut {stripsForSquares} strips at {toFraction(squareCutSize)}" wide
+                        Cut {stripsForLightSquares} strips at {toFraction(squareCutSize)}" wide
                       </p>
                       <p className="text-sm opacity-90 mb-1">
                         Then cross-cut into {toFraction(squareCutSize)}" squares
@@ -240,11 +256,34 @@ export default function App() {
                         • {squaresPerStrip} squares per strip
                       </p>
                       <p className="text-sm opacity-90 mb-1">
-                        • Total needed: {totalSquares} squares
+                        • Total needed: {totalLightSquares} squares
                       </p>
                       <div className="mt-3 pt-3 border-t border-white/30">
                         <p className="font-semibold">
-                          Yardage: {yardageSquares.toFixed(2)} yards
+                          Yardage: {yardageLightSquares.toFixed(2)} yards
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {totalDarkSquares > 0 && (
+                    <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+                      <h3 className="font-semibold text-lg mb-2">Dark Fabric - Plain Squares</h3>
+                      <p className="text-2xl font-bold mb-2">
+                        Cut {stripsForDarkSquares} strips at {toFraction(squareCutSize)}" wide
+                      </p>
+                      <p className="text-sm opacity-90 mb-1">
+                        Then cross-cut into {toFraction(squareCutSize)}" squares
+                      </p>
+                      <p className="text-sm opacity-90 mb-3">
+                        • {squaresPerStrip} squares per strip
+                      </p>
+                      <p className="text-sm opacity-90 mb-1">
+                        • Total needed: {totalDarkSquares} squares
+                      </p>
+                      <div className="mt-3 pt-3 border-t border-white/30">
+                        <p className="font-semibold">
+                          Yardage: {yardageDarkSquares.toFixed(2)} yards
                         </p>
                       </div>
                     </div>
@@ -290,8 +329,11 @@ export default function App() {
                 <div className="mt-6 pt-6 border-t border-white/30">
                   <div className="text-xl font-bold">
                     <p className="mb-2">Total Yardage Summary:</p>
-                    {totalSquares > 0 && (
-                      <p className="text-base font-normal">Squares: {yardageSquares.toFixed(2)} yards</p>
+                    {totalLightSquares > 0 && (
+                      <p className="text-base font-normal">Light Squares: {yardageLightSquares.toFixed(2)} yards</p>
+                    )}
+                    {totalDarkSquares > 0 && (
+                      <p className="text-base font-normal">Dark Squares: {yardageDarkSquares.toFixed(2)} yards</p>
                     )}
                     {totalHST > 0 && (
                       <>
@@ -322,22 +364,23 @@ export default function App() {
         {/* Example Presets */}
         <div className="bg-white rounded-lg shadow-xl p-6">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">Quick Presets</h2>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-4 gap-4">
             <button
               onClick={() => {
                 setFinishedBlockSize(6);
                 setNumBlocks(49);
                 setLayout({rows: 7, cols: 7});
-                setSquaresPerBlock(1);
+                setLightSquaresPerBlock(4);
+                setDarkSquaresPerBlock(1);
                 setSquareFinishedSize(2);
                 setHstPerBlock(4);
                 setHstFinishedSize(2);
               }}
               className="p-4 bg-purple-100 hover:bg-purple-200 rounded-lg text-left transition-colors"
             >
-              <h3 className="font-semibold text-purple-900">Churn Dash</h3>
+              <h3 className="font-semibold text-purple-900">Shoo Fly</h3>
               <p className="text-sm text-purple-700">6" block, 49 blocks (7×7)</p>
-              <p className="text-xs text-purple-600">1×2" square + 4×2" HST</p>
+              <p className="text-xs text-purple-600">4 light + 1 dark square, 4×2" HST</p>
             </button>
             
             <button
@@ -345,7 +388,8 @@ export default function App() {
                 setFinishedBlockSize(12);
                 setNumBlocks(20);
                 setLayout({rows: 4, cols: 5});
-                setSquaresPerBlock(0);
+                setLightSquaresPerBlock(0);
+                setDarkSquaresPerBlock(0);
                 setSquareFinishedSize(3);
                 setHstPerBlock(8);
                 setHstFinishedSize(3);
@@ -362,7 +406,8 @@ export default function App() {
                 setFinishedBlockSize(9);
                 setNumBlocks(30);
                 setLayout({rows: 5, cols: 6});
-                setSquaresPerBlock(5);
+                setLightSquaresPerBlock(4);
+                setDarkSquaresPerBlock(1);
                 setSquareFinishedSize(3);
                 setHstPerBlock(4);
                 setHstFinishedSize(3);
@@ -371,7 +416,97 @@ export default function App() {
             >
               <h3 className="font-semibold text-blue-900">Sawtooth Star</h3>
               <p className="text-sm text-blue-700">9" block, 30 blocks (5×6)</p>
-              <p className="text-xs text-blue-600">5×3" squares + 4×3" HST</p>
+              <p className="text-xs text-blue-600">4 light + 1 dark, 4×3" HST</p>
+            </button>
+            
+            <button
+              onClick={() => {
+                setFinishedBlockSize(12);
+                setNumBlocks(12);
+                setLayout({rows: 3, cols: 4});
+                setLightSquaresPerBlock(4);
+                setDarkSquaresPerBlock(5);
+                setSquareFinishedSize(4);
+                setHstPerBlock(0);
+                setHstFinishedSize(2);
+              }}
+              className="p-4 bg-green-100 hover:bg-green-200 rounded-lg text-left transition-colors"
+            >
+              <h3 className="font-semibold text-green-900">Nine Patch</h3>
+              <p className="text-sm text-green-700">12" block, 12 blocks (3×4)</p>
+              <p className="text-xs text-green-600">4 light + 5 dark squares</p>
+            </button>
+            
+            <button
+              onClick={() => {
+                setFinishedBlockSize(10);
+                setNumBlocks(25);
+                setLayout({rows: 5, cols: 5});
+                setLightSquaresPerBlock(8);
+                setDarkSquaresPerBlock(1);
+                setSquareFinishedSize(2.5);
+                setHstPerBlock(4);
+                setHstFinishedSize(2.5);
+              }}
+              className="p-4 bg-yellow-100 hover:bg-yellow-200 rounded-lg text-left transition-colors"
+            >
+              <h3 className="font-semibold text-yellow-900">Ohio Star</h3>
+              <p className="text-sm text-yellow-700">10" block, 25 blocks (5×5)</p>
+              <p className="text-xs text-yellow-600">8 light + 1 dark, 4 HST</p>
+            </button>
+            
+            <button
+              onClick={() => {
+                setFinishedBlockSize(8);
+                setNumBlocks(42);
+                setLayout({rows: 6, cols: 7});
+                setLightSquaresPerBlock(2);
+                setDarkSquaresPerBlock(2);
+                setSquareFinishedSize(4);
+                setHstPerBlock(0);
+                setHstFinishedSize(2);
+              }}
+              className="p-4 bg-red-100 hover:bg-red-200 rounded-lg text-left transition-colors"
+            >
+              <h3 className="font-semibold text-red-900">Four Patch</h3>
+              <p className="text-sm text-red-700">8" block, 42 blocks (6×7)</p>
+              <p className="text-xs text-red-600">2 light + 2 dark squares</p>
+            </button>
+            
+            <button
+              onClick={() => {
+                setFinishedBlockSize(6);
+                setNumBlocks(35);
+                setLayout({rows: 5, cols: 7});
+                setLightSquaresPerBlock(1);
+                setDarkSquaresPerBlock(0);
+                setSquareFinishedSize(2);
+                setHstPerBlock(8);
+                setHstFinishedSize(2);
+              }}
+              className="p-4 bg-indigo-100 hover:bg-indigo-200 rounded-lg text-left transition-colors"
+            >
+              <h3 className="font-semibold text-indigo-900">Dutchman's Puzzle</h3>
+              <p className="text-sm text-indigo-700">6" block, 35 blocks (5×7)</p>
+              <p className="text-xs text-indigo-600">1 center square, 8 HST</p>
+            </button>
+            
+            <button
+              onClick={() => {
+                setFinishedBlockSize(15);
+                setNumBlocks(6);
+                setLayout({rows: 2, cols: 3});
+                setLightSquaresPerBlock(5);
+                setDarkSquaresPerBlock(4);
+                setSquareFinishedSize(5);
+                setHstPerBlock(0);
+                setHstFinishedSize(2);
+              }}
+              className="p-4 bg-teal-100 hover:bg-teal-200 rounded-lg text-left transition-colors"
+            >
+              <h3 className="font-semibold text-teal-900">Checkerboard</h3>
+              <p className="text-sm text-teal-700">15" block, 6 blocks (2×3)</p>
+              <p className="text-xs text-teal-600">5 light + 4 dark squares</p>
             </button>
           </div>
         </div>

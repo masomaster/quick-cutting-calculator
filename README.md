@@ -65,24 +65,6 @@ npm run preview
 npm ls react react-dom --depth=0
 ```
 
-### Specific error you may encounter
-
-If you see an error like:
-
-```
-Uncaught SyntaxError: The requested module '/node_modules/.vite/deps/lucide-react.js' does not provide an export named 'Grid3x3'
-```
-
-It means the icon name you imported from `lucide-react` doesn't exist in your installed version. The fix is to import an available icon name. For example, replace in `src/App.jsx`:
-
-```diff
--import { Calculator, Scissors, Grid3x3 } from 'lucide-react';
-+import { Calculator, Scissors, Grid } from 'lucide-react';
-```
-
-and update any JSX that used `<Grid3x3 />` to `<Grid />` (or another exported icon). You can inspect available icons in `node_modules/lucide-react/dist/esm/icons/` if you need a different name.
-
-After making that change, save the file and Vite will HMR the module. Reload the page if needed.
 
 ### If dev server isn't responding
 
