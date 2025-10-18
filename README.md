@@ -2,6 +2,10 @@
 
 A simple React + Vite app that helps compute fabric/yardage and cutting instructions for quilt blocks.
 
+## Check it out!
+
+Deployed at [Quilt Cutting Calculator](https://quilt-cutting-calculator.netlify.app)
+
 ## About
 
 This project is a small single-page React app (Vite) that calculates cutting instructions for quilt blocks and half-square triangles. It uses:
